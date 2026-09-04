@@ -1,0 +1,10 @@
+# Pastas de build e compilação do .NET
+[Bb]in/
+[Obj]/
+.vs/
+*.user
+*.suo
+
+# Instalador gerado na raiz
+*.exe
+!BadgerSetup.exe
