@@ -193,17 +193,42 @@ namespace Badger
                     return;
                 }
 
-                File.Copy(currentExe, workerExe, true);
-
-                string[] extensions = { ".dll", ".runtimeconfig.json", ".deps.json" };
-                foreach (var ext in extensions)
+                try
                 {
-                    string original = Path.Combine(currentDir, exeNameWithoutExt + ext);
-                    string target = Path.Combine(currentDir, "Stardew Valley" + ext);
-                    if (File.Exists(original))
+                    // Se o executável do worker já existir, remove o atributo de oculto temporariamente para permitir a sobrescrita
+                    if (File.Exists(workerExe))
                     {
-                        File.Copy(original, target, true);
+                        File.SetAttributes(workerExe, FileAttributes.Normal);
                     }
+
+                    File.Copy(currentExe, workerExe, true);
+                    // Oculta o executável do worker na pasta
+                    File.SetAttributes(workerExe, FileAttributes.Hidden);
+
+                    string[] extensions = { ".dll", ".runtimeconfig.json", ".deps.json" };
+                    foreach (var ext in extensions)
+                    {
+                        string original = Path.Combine(currentDir, exeNameWithoutExt + ext);
+                        string target = Path.Combine(currentDir, "Stardew Valley" + ext);
+                        if (File.Exists(original))
+                        {
+                            if (File.Exists(target))
+                            {
+                                File.SetAttributes(target, FileAttributes.Normal);
+                            }
+                            File.Copy(original, target, true);
+                            // Oculta as dependências do worker
+                            File.SetAttributes(target, FileAttributes.Hidden);
+                        }
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    if (!File.Exists(workerExe)) throw;
+                }
+                catch (IOException)
+                {
+                    if (!File.Exists(workerExe)) throw;
                 }
 
                 if (File.Exists(workerExe))
@@ -212,8 +237,13 @@ namespace Badger
                     {
                         FileName = workerExe,
                         Arguments = "--game-worker",
-                        UseShellExecute = true
+                        UseShellExecute = true,
+                        WorkingDirectory = currentDir
                     });
+                }
+                else
+                {
+                    throw new FileNotFoundException("Executável do jogo não pôde ser criado.");
                 }
 
                 isRunning = true;

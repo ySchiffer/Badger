@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("badger")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f056f433d5669310216bfea52249eee841dab0ed")]
 [assembly: System.Reflection.AssemblyProductAttribute("badger")]
 [assembly: System.Reflection.AssemblyTitleAttribute("badger")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

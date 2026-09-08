@@ -2,7 +2,7 @@
 AppName=Badger
 AppVersion=1.0
 DefaultDirName={autopf}\Badger
-DefaultGroupName=Badger
+DefaultGroupName=Default
 OutputDir=.
 OutputBaseFilename=BadgerSetup
 Compression=lzma
@@ -10,15 +10,17 @@ SolidCompression=yes
 SetupIconFile=app.ico
 WizardStyle=modern dynamic
 UsePreviousAppDir=no
-; Remove completamente a página de escolher a pasta do Menu Iniciar
 DisableProgramGroupPage=yes
+UninstallFilesDir={app}
+UninstallDisplayName=Desinstalar
+AppMutex=BadgerSetup
 
 [Languages]
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 
 [Files]
-Source: "bin\Release\net10.0-windows\Badger.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bin\Release\net10.0-windows\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Copia todos os arquivos do build para a raiz da pasta de instalação
+Source: "bin\Release\net10.0-windows\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "app.ico"; DestDir: "{app}"; Flags: ignoreversion
 
@@ -38,12 +40,11 @@ Filename: "{app}\Badger.exe"; Description: "Executar Badger agora"; Flags: nowai
 Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "BadgerGameActivity"; ValueData: """{app}\Badger.exe"""; Tasks: startupicon; Flags: uninsdeletevalue
 
 [UninstallDelete]
-; Remove os arquivos de worker do Stardew Valley gerados em tempo de execução
+; Remove os arquivos ocultos do worker gerados em tempo de execução na desinstalação
 Type: files; Name: "{app}\Stardew Valley.exe"
 Type: files; Name: "{app}\Stardew Valley.dll"
 Type: files; Name: "{app}\Stardew Valley.deps.json"
 Type: files; Name: "{app}\Stardew Valley.runtimeconfig.json"
-; Garante que a pasta raiz do Badger seja completamente apagada se sobrarem arquivos temporários
 Type: dirifempty; Name: "{app}"
 
 [Code]

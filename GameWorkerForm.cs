@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace Badger
@@ -8,23 +9,20 @@ namespace Badger
         public GameWorkerForm()
         {
             this.Text = "Stardew Valley";
-            this.Width = 250;
-            this.Height = 250;
             this.ShowInTaskbar = false;
             this.WindowState = FormWindowState.Minimized;
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.ShowIcon = false;
-
-            System.Windows.Forms.Timer keepAlive = new System.Windows.Forms.Timer();
-            keepAlive.Interval = 10000;
-            keepAlive.Tick += (s, e) => { this.Text = "Stardew Valley"; };
-            keepAlive.Start();
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            NativeMethods.SetWindowText(this.Handle, "Stardew Valley");
+            Win32Native.SetWindowText(this.Handle, "Stardew Valley");
         }
+    }
+
+    internal static class Win32Native
+    {
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool SetWindowText(IntPtr hWnd, string lpString);
     }
 }

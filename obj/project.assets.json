@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ischi\\Desktop\\New Badger\\badger.csproj",
+      "projectUniqueName": "C:\\Users\\ischi\\Desktop\\Arquivos\\Pessoal\\Badger\\badger.csproj",
       "projectName": "badger",
-      "projectPath": "C:\\Users\\ischi\\Desktop\\New Badger\\badger.csproj",
+      "projectPath": "C:\\Users\\ischi\\Desktop\\Arquivos\\Pessoal\\Badger\\badger.csproj",
       "packagesPath": "C:\\Users\\ischi\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ischi\\Desktop\\New Badger\\obj\\",
+      "outputPath": "C:\\Users\\ischi\\Desktop\\Arquivos\\Pessoal\\Badger\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ischi\\AppData\\Roaming\\NuGet\\NuGet.Config"
