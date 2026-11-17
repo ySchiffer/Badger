@@ -10,6 +10,8 @@ namespace Badger
         private MainForm mainForm;
         private CheckBox chkHide;
         private CheckBox chkStartup;
+        private CheckBox chkStartInTray;
+        private bool isUpdatingStates = false;
 
         public CustomDropdownMenu(MainForm owner)
         {
@@ -19,7 +21,7 @@ namespace Badger
             this.ShowInTaskbar = false;
             this.TopMost = true;
             this.Width = 310;
-            this.Height = 135;
+            this.Height = 170;
 
             bool isDark = ThemeHelper.IsDarkTheme();
             this.BackColor = isDark ? Color.FromArgb(40, 40, 40) : Color.White;
@@ -36,7 +38,7 @@ namespace Badger
                 Checked = mainForm.HideToTrayOnClose
             };
             chkHide.CheckedChanged += (s, e) => {
-                mainForm.SetHideToTray(chkHide.Checked);
+                if (!isUpdatingStates) mainForm.SetHideToTray(chkHide.Checked);
             };
             this.Controls.Add(chkHide);
 
@@ -52,14 +54,30 @@ namespace Badger
                 Checked = mainForm.StartWithWindows
             };
             chkStartup.CheckedChanged += (s, e) => {
-                mainForm.SetStartup(chkStartup.Checked);
+                if (!isUpdatingStates) mainForm.SetStartup(chkStartup.Checked);
             };
             this.Controls.Add(chkStartup);
+
+            chkStartInTray = new CheckBox()
+            {
+                Text = "Inicializar na bandeja",
+                Left = 15,
+                Top = 85,
+                Width = 280,
+                Height = 24,
+                Font = new Font("Segoe UI", 9F, FontStyle.Regular),
+                ForeColor = isDark ? Color.White : Color.Black,
+                Checked = mainForm.StartInTray
+            };
+            chkStartInTray.CheckedChanged += (s, e) => {
+                if (!isUpdatingStates) mainForm.SetStartInTray(chkStartInTray.Checked);
+            };
+            this.Controls.Add(chkStartInTray);
 
             Panel separator = new Panel()
             {
                 Left = 15,
-                Top = 85,
+                Top = 120,
                 Width = 280,
                 Height = 1,
                 BackColor = isDark ? Color.FromArgb(70, 70, 70) : Color.Silver
@@ -70,7 +88,7 @@ namespace Badger
             {
                 Text = "Suporte: Discord",
                 Left = 15,
-                Top = 98,
+                Top = 133,
                 Width = 140,
                 Height = 20,
                 Font = new Font("Segoe UI", 9F, FontStyle.Regular),
@@ -86,7 +104,7 @@ namespace Badger
             {
                 Text = "Salvo automaticamente",
                 Left = 170,
-                Top = 98,
+                Top = 133,
                 Width = 125,
                 Height = 20,
                 TextAlign = ContentAlignment.MiddleRight,
@@ -98,8 +116,17 @@ namespace Badger
 
         public void UpdateStates()
         {
-            if (chkHide != null) chkHide.Checked = mainForm.HideToTrayOnClose;
-            if (chkStartup != null) chkStartup.Checked = mainForm.StartWithWindows;
+            isUpdatingStates = true;
+            try
+            {
+                if (chkHide != null) chkHide.Checked = mainForm.HideToTrayOnClose;
+                if (chkStartup != null) chkStartup.Checked = mainForm.StartWithWindows;
+                if (chkStartInTray != null) chkStartInTray.Checked = mainForm.StartInTray;
+            }
+            finally
+            {
+                isUpdatingStates = false;
+            }
         }
 
         protected override void OnDeactivate(EventArgs e)

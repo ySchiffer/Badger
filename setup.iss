@@ -25,26 +25,30 @@ Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "app.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Badger"; Filename: "{app}\Badger.exe"; IconFilename: "{app}\app.ico"
+Name: "{group}\Badger"; Filename: "{app}\Badger.exe"; Parameters: "--show"; IconFilename: "{app}\app.ico"
 Name: "{group}\Documentação (README)"; Filename: "{app}\README.md"
-Name: "{autodesktop}\Badger"; Filename: "{app}\Badger.exe"; IconFilename: "{app}\app.ico"; Tasks: desktopicon
+Name: "{autodesktop}\Badger"; Filename: "{app}\Badger.exe"; Parameters: "--show"; IconFilename: "{app}\app.ico"; Tasks: desktopicon
 
 [Tasks]
 Name: "desktopicon"; Description: "Criar ícone na Área de Trabalho"; GroupDescription: "Atalhos:"
 Name: "startupicon"; Description: "Iniciar junto com o Windows automaticamente"; GroupDescription: "Configurações:"
+Name: "startintray"; Description: "Inicializar na bandeja"; GroupDescription: "Configurações:"
 
 [Run]
 Filename: "{app}\Badger.exe"; Description: "Executar Badger agora"; Flags: nowait postinstall skipifsilent
 
 [Registry]
-Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "BadgerGameActivity"; ValueData: """{app}\Badger.exe"""; Tasks: startupicon; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "BadgerGameActivity"; ValueData: """{app}\Badger.exe"" --autostart"; Tasks: startupicon; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "SOFTWARE\Badger"; ValueType: dword; ValueName: "StartInTray"; ValueData: "1"; Tasks: startintray; Flags: uninsdeletekey
+Root: HKCU; Subkey: "SOFTWARE\Badger"; ValueType: dword; ValueName: "StartInTray"; ValueData: "0"; Tasks: not startintray; Flags: uninsdeletekey
 
 [UninstallDelete]
-; Remove os arquivos ocultos do worker gerados em tempo de execução na desinstalação
+; Remove os arquivos ocultos do worker e logs gerados em tempo de execução na desinstalação
 Type: files; Name: "{app}\Stardew Valley.exe"
 Type: files; Name: "{app}\Stardew Valley.dll"
 Type: files; Name: "{app}\Stardew Valley.deps.json"
 Type: files; Name: "{app}\Stardew Valley.runtimeconfig.json"
+Type: files; Name: "{app}\crash_log.txt"
 Type: dirifempty; Name: "{app}"
 
 [Code]
@@ -52,6 +56,33 @@ var
   InfoPage: TWizardPage;
   InfoLabel: TNewStaticText;
   DiscordButton: TNewButton;
+
+procedure CloseRunningInstances();
+var
+  ResultCode: Integer;
+begin
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM "Badger.exe" /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM "Stardew Valley.exe" /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Sleep(500);
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  CloseRunningInstances();
+  Result := '';
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usUninstall then
+  begin
+    CloseRunningInstances();
+  end
+  else if CurUninstallStep = usPostUninstall then
+  begin
+    RegDeleteValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 'BadgerGameActivity');
+  end;
+end;
 
 procedure DiscordButtonOnClick(Sender: TObject);
 var

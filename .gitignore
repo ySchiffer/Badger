@@ -8,3 +8,5 @@
 # Instalador gerado na raiz
 *.exe
 !BadgerSetup.exe
+bin/
+obj/
